@@ -5,6 +5,7 @@
   "description": "A Strapi application",
   "scripts": {
     "build": "strapi build",
+    "render-build": "npm install --include=dev && npm run build",
     "console": "strapi console",
     "deploy": "strapi deploy",
     "dev": "strapi develop",
@@ -23,13 +24,14 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
-    "styled-components": "^6.0.0"
+    "styled-components": "^6.0.0",
+    "typescript": "^5"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "typescript": "^5"
+    "esbuild": "^0.25.0"
   },
   "engines": {
     "node": ">=20.0.0 <=26.x.x",

@@ -184,13 +184,28 @@ Every `git push` triggers:
 
 | Problem | Fix |
 |---|---|
+| **Build fails: `typescript` not found** | Use `npm run render-build` (installs dev deps). Set `NPM_CONFIG_PRODUCTION=false` on Render. |
+| **Build fails: `better-sqlite3` compile error** | Fixed — moved to `optionalDependencies` (production uses Postgres only). |
+| **Build fails: JavaScript heap out of memory** | Render free tier has 512MB RAM; Strapi admin build needs more. Upgrade to **Starter** ($7/mo) OR set build command to `npm run render-build`. |
+| **Build fails: cannot find module** | Ensure **Root Directory** is `cms` on Render. |
 | Homepage empty | Strapi sleeping — wait 30–60s, refresh |
 | CORS error | Set `FRONTEND_URL` on Render to exact Vercel URL |
 | Images broken | Set `NEXT_PUBLIC_STRAPI_URL` correctly; check Strapi uploads |
 | 403 on API | Enable Public permissions in Strapi admin |
 | Build fails on Vercel | Ensure Root Directory is `.` not `cms` |
-| Build fails on Render | Ensure Root Directory is `cms` |
+| **Database connection failed** | Set `DATABASE_SSL=true` and `DATABASE_SSL_REJECT_UNAUTHORIZED=false` on Render |
 | Draft preview fails | Add `STRAPI_API_TOKEN` on Vercel |
+
+### Render manual build settings
+
+If not using Blueprint, set these in the Render dashboard:
+
+| Field | Value |
+|---|---|
+| Root Directory | `cms` |
+| Build Command | `npm run render-build` |
+| Start Command | `npm run start` |
+| Node Version | `20.18.0` |
 
 ---
 
