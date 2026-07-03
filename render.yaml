@@ -1,0 +1,50 @@
+# Strapi CMS — deploy from the same repo (Root Directory: cms)
+# Dashboard: https://dashboard.render.com → New Blueprint → connect repo
+#
+# Strapi cannot run on Vercel (needs a persistent Node server + database).
+# Frontend → Vercel | CMS → Render | Database → Neon (free)
+
+databases:
+  - name: salina-db
+    plan: free
+    databaseName: salina_blog
+    user: salina
+
+services:
+  - type: web
+    name: salina-cms
+    runtime: node
+    plan: free
+    rootDir: cms
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /admin
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATABASE_CLIENT
+        value: postgres
+      - key: DATABASE_URL
+        fromDatabase:
+          name: salina-db
+          property: connectionString
+      - key: DATABASE_SSL
+        value: "true"
+      - key: FRONTEND_URL
+        sync: false
+      - key: APP_KEYS
+        generateValue: true
+      - key: API_TOKEN_SALT
+        generateValue: true
+      - key: ADMIN_JWT_SECRET
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: TRANSFER_TOKEN_SALT
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true

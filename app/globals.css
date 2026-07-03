@@ -1,26 +1,102 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: #faf7f2;
+  --color-cream-dark: #f0ebe3;
+  --color-ink: #2c2825;
+  --color-ink-muted: #6b6560;
+  --color-terracotta: #c4714f;
+  --color-terracotta-dark: #a85a3a;
+  --color-sage: #3d5a47;
+  --color-sage-light: #5a7a64;
+  --color-charcoal: #1a1816;
+  --color-charcoal-light: #2a2724;
+  --color-gold: #c9a96e;
+
+  --font-display: var(--font-cormorant);
+  --font-body: var(--font-dm-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-cream text-ink font-body antialiased transition-colors duration-300;
+  }
+
+  .dark body,
+  body:where(.dark *) {
+    @apply bg-charcoal text-cream;
+  }
+
+  ::selection {
+    @apply bg-terracotta/20 text-ink;
+  }
+
+  .dark ::selection {
+    @apply bg-terracotta/30 text-cream;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .prose-blog {
+    @apply max-w-none text-lg leading-relaxed text-ink/90 dark:text-cream/90;
+  }
+
+  .prose-blog h2 {
+    @apply mt-12 mb-4 font-display text-3xl font-medium tracking-tight text-ink dark:text-cream;
+  }
+
+  .prose-blog h3 {
+    @apply mt-8 mb-3 font-display text-2xl font-medium text-ink dark:text-cream;
+  }
+
+  .prose-blog p {
+    @apply mb-6;
+  }
+
+  .prose-blog a {
+    @apply text-terracotta underline decoration-terracotta/30 underline-offset-4 transition-colors hover:text-terracotta-dark hover:decoration-terracotta;
+  }
+
+  .prose-blog ul,
+  .prose-blog ol {
+    @apply mb-6 ml-6 space-y-2;
+  }
+
+  .prose-blog ul {
+    @apply list-disc;
+  }
+
+  .prose-blog ol {
+    @apply list-decimal;
+  }
+
+  .prose-blog blockquote {
+    @apply my-8 border-l-4 border-terracotta pl-6 font-display text-2xl italic text-ink/80 dark:text-cream/80;
+  }
+
+  .prose-blog img {
+    @apply my-8 w-full rounded-sm;
+  }
+
+  .prose-blog figure {
+    @apply my-10;
+  }
+
+  .prose-blog figcaption {
+    @apply mt-2 text-center text-sm text-ink-muted dark:text-cream/60;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-terracotta;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
 }

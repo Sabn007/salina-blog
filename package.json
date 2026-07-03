@@ -4,20 +4,32 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:cms": "npm run develop --prefix cms",
+    "dev:all": "npx concurrently \"npm run dev\" \"npm run dev:cms\"",
     "build": "next build",
+    "build:cms": "npm run build --prefix cms",
     "start": "next start",
+    "start:cms": "npm run start --prefix cms",
     "lint": "eslint"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "feed": "^5.2.1",
+    "isomorphic-dompurify": "^2.36.0",
+    "marked": "^18.0.5",
     "next": "16.2.10",
+    "next-themes": "^0.4.6",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^10.0.3",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",

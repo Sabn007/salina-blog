@@ -1,65 +1,158 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { PostCard } from '@/components/blog/PostCard';
+import { PostGrid } from '@/components/blog/PostGrid';
+import { NewsletterForm } from '@/components/newsletter/NewsletterForm';
+import { AdSense } from '@/components/ads/AdSense';
+import { getFeaturedPosts, getPosts, getCategories } from '@/lib/strapi/queries';
+import { buildPageMetadata } from '@/lib/seo';
 
-export default function Home() {
+export const metadata = buildPageMetadata({
+  title: 'Home',
+  description:
+    'A premium lifestyle and travel journal — curated stories, destinations, and inspiration for the modern wanderer.',
+});
+
+export default async function HomePage() {
+  let featured: Awaited<ReturnType<typeof getFeaturedPosts>>['data'] = [];
+  let recent: Awaited<ReturnType<typeof getPosts>>['data'] = [];
+  let categories: Awaited<ReturnType<typeof getCategories>>['data'] = [];
+
+  try {
+    const [featuredRes, recentRes, categoriesRes] = await Promise.all([
+      getFeaturedPosts(1),
+      getPosts(1, 6),
+      getCategories(),
+    ]);
+    featured = featuredRes.data;
+    recent = recentRes.data;
+    categories = categoriesRes.data;
+  } catch {
+    // Strapi may not be running during build — show empty state
+  }
+
+  const heroPost = featured[0] || recent[0];
+  const gridPosts = recent.filter((p) => p.documentId !== heroPost?.documentId);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <>
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-sage px-4 py-24 text-cream sm:px-6 lg:px-8">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-gold blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 h-96 w-96 rounded-full bg-terracotta blur-3xl" />
+        </div>
+        <div className="relative mx-auto max-w-4xl text-center">
+          <p className="section-label text-gold">Lifestyle & Travel Journal</p>
+          <h1 className="mt-4 font-display text-5xl font-medium leading-tight tracking-tight md:text-7xl">
+            Stories for the
+            <br />
+            <em className="text-gold">Curious Wanderer</em>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-cream/80">
+            Discover curated travel guides, hotel reviews, and lifestyle inspiration from
+            destinations around the world.
           </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              href="/blog"
+              className="rounded-sm bg-terracotta px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-terracotta-dark"
+            >
+              Read the Journal
+            </Link>
+            <Link
+              href="/about"
+              className="rounded-sm border border-cream/30 px-8 py-3 text-sm font-semibold uppercase tracking-wider text-cream transition-colors hover:border-cream hover:bg-cream/10"
+            >
+              About Salina
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      {/* Featured Post */}
+      {heroPost && (
+        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mb-8 flex items-end justify-between">
+            <div>
+              <p className="section-label">Featured Story</p>
+              <h2 className="mt-2 font-display text-3xl font-medium text-ink dark:text-cream">
+                Editor&apos;s Pick
+              </h2>
+            </div>
+          </div>
+          <PostCard post={heroPost} variant="featured" priority />
+        </section>
+      )}
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <AdSense slot="home-mid" className="my-4" />
+      </div>
+
+      {/* Categories */}
+      {categories.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mb-8 flex items-end justify-between">
+            <div>
+              <p className="section-label">Browse</p>
+              <h2 className="mt-2 font-display text-3xl font-medium text-ink dark:text-cream">
+                Categories
+              </h2>
+            </div>
+            <Link
+              href="/categories"
+              className="text-sm font-medium text-terracotta transition-colors hover:text-terracotta-dark"
+            >
+              View All →
+            </Link>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {categories.map((category) => (
+              <Link
+                key={category.documentId}
+                href={`/category/${category.slug}`}
+                className="rounded-full border border-ink/10 px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-terracotta hover:text-terracotta dark:border-cream/20 dark:text-cream"
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Recent Posts */}
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <p className="section-label">Latest</p>
+            <h2 className="mt-2 font-display text-3xl font-medium text-ink dark:text-cream">
+              Recent Stories
+            </h2>
+          </div>
+          <Link
+            href="/blog"
+            className="text-sm font-medium text-terracotta transition-colors hover:text-terracotta-dark"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            View All →
+          </Link>
         </div>
-      </main>
-    </div>
+        <PostGrid posts={gridPosts} />
+      </section>
+
+      {/* Newsletter CTA */}
+      <section className="bg-cream-dark px-4 py-20 dark:bg-charcoal-light sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="section-label">Stay Inspired</p>
+          <h2 className="mt-4 font-display text-4xl font-medium text-ink dark:text-cream">
+            Join the Salina Circle
+          </h2>
+          <p className="mt-4 text-ink-muted dark:text-cream/60">
+            Weekly dispatches on travel, style, and slow living — no spam, ever.
+          </p>
+          <div className="mt-8">
+            <NewsletterForm variant="inline" />
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

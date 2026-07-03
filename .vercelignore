@@ -1,0 +1,2 @@
+# Strapi CMS runs on Render — exclude from Vercel upload
+cms/
