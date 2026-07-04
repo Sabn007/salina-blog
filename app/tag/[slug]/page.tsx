@@ -4,6 +4,8 @@ import { Pagination } from '@/components/ui/Pagination';
 import { getPostsByTag, getTagBySlug } from '@/lib/strapi/queries';
 import { buildPageMetadata } from '@/lib/seo';
 
+export const dynamicParams = true;
+
 export async function generateMetadata({
   params,
 }: {

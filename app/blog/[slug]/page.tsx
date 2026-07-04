@@ -11,6 +11,9 @@ import { getAllPostSlugs, getPostBySlug } from '@/lib/strapi/queries';
 import { buildArticleJsonLd, buildPostMetadata } from '@/lib/seo';
 import Link from 'next/link';
 
+// Allow slugs not returned by generateStaticParams to be rendered on-demand
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
   try {
     const slugs = await getAllPostSlugs();
