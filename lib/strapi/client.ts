@@ -35,7 +35,7 @@ export async function strapiFetch<T>(path: string, options: FetchOptions = {}): 
       ...headers,
     },
     // Always fetch fresh data in dev so CMS changes appear immediately
-    ...(IS_DEV ? { cache: 'no-store' as const } : { next: next ?? { revalidate: 60 } }),
+    ...(IS_DEV ? { cache: 'no-store' as const } : { next: next ?? { revalidate: 30 } }),
   });
 
   if (!response.ok) {
