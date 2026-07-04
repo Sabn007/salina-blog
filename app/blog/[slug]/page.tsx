@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
-import DOMPurify from 'isomorphic-dompurify';
+import { marked } from 'marked';
 import { PostHero } from '@/components/blog/PostHero';
 import { ReadingProgress } from '@/components/blog/ReadingProgress';
 import { RelatedPosts, PostGallery } from '@/components/blog/RelatedPosts';
@@ -51,7 +51,7 @@ export default async function BlogPostPage({
   const post = await getPostBySlug(slug, isPreview).catch(() => null);
   if (!post) notFound();
 
-  const sanitizedContent = DOMPurify.sanitize(post.content);
+  const htmlContent = await marked.parse(post.content || '');
   const jsonLd = buildArticleJsonLd(post);
 
   return (
@@ -76,7 +76,7 @@ export default async function BlogPostPage({
 
         <div
           className="prose-blog"
-          dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
 
         {post.gallery && post.gallery.length > 0 && (
