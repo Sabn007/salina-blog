@@ -62,27 +62,26 @@ const HIGHLIGHTS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
       </svg>
     ),
-    title: 'Authentic Guides',
-    desc: 'Written from firsthand experience across Nepal\u2019s diverse landscapes and cultures.',
+    title: 'Travel & Culture',
+    desc: 'Destinations, local experiences, and stories that go beyond the typical guidebook.',
   },
   {
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-6 w-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
       </svg>
     ),
-    title: 'Hidden Gems',
-    desc: 'Discover destinations, foods, and traditions beyond the typical tourist trail.',
+    title: 'Lifestyle & Wellness',
+    desc: 'Health, habits, career, and everyday advice to help you live with more intention.',
   },
   {
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-6 w-6">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
       </svg>
     ),
-    title: 'Responsible Travel',
-    desc: 'Supporting sustainable tourism and the communities that make Nepal extraordinary.',
+    title: 'Ideas & Inspiration',
+    desc: 'Sports, history, relationships, and topics that spark curiosity and meaningful conversation.',
   },
 ];
 
@@ -103,8 +102,8 @@ export function AboutContent() {
               Hi, I&apos;m <em className="text-gold">Salina</em>
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-cream/80">
-              Tourism & hospitality professional, travel writer, and storyteller —
-              helping you experience Nepal beyond the guidebook.
+              Tourism & hospitality professional, content writer, and lifelong learner —
+              sharing thoughtful articles that inform, inspire, and help in everyday life.
             </p>
           </RevealSection>
         </div>
@@ -113,9 +112,9 @@ export function AboutContent() {
       {/* Story */}
       <section className="mx-auto max-w-3xl px-4 py-20 sm:px-6 lg:px-8">
         <RevealSection>
-          <p className="section-label">My Story</p>
+          <p className="section-label">About Me</p>
           <h2 className="mt-2 font-display text-3xl font-medium text-ink dark:text-cream md:text-4xl">
-            Where It All Began
+            A Space for Curious Readers
           </h2>
         </RevealSection>
 
@@ -123,37 +122,46 @@ export function AboutContent() {
           <RevealSection delay={100}>
             <p className="text-lg leading-relaxed text-ink/85 dark:text-cream/85">
               Welcome! I&apos;m <strong className="font-semibold text-ink dark:text-cream">Salina Maharjan</strong>,
-              a tourism and hospitality professional with a Bachelor&apos;s degree in Travel and Tourism
-              Management and a passion for discovering the beauty, culture, and hidden stories of Nepal.
+              a tourism and hospitality professional, content writer, and lifelong learner with a
+              Bachelor&apos;s degree in <strong className="font-semibold text-ink dark:text-cream">Travel and Tourism Management</strong>.
+              I created this blog as a place to share reliable, engaging, and thoughtfully researched
+              content that informs, inspires, and helps readers in their everyday lives.
             </p>
           </RevealSection>
 
           <RevealSection delay={200}>
             <p className="text-lg leading-relaxed text-ink/85 dark:text-cream/85">
-              My journey in the travel industry has allowed me to work in tour operations, travel planning,
-              and guest services, giving me valuable insight into what makes a memorable travel experience.
-              From organizing tours and coordinating travel arrangements to welcoming guests from around
-              the world, I&apos;ve learned that every journey is more than just visiting a destination —
-              it&apos;s about creating meaningful experiences.
+              While my professional background is rooted in the travel and hospitality industry, my
+              interests extend far beyond a single niche. Here, you&apos;ll find articles covering{' '}
+              <strong className="font-semibold text-ink dark:text-cream">travel, health, sports, lifestyle, career, relationships, history</strong>,
+              and other topics that encourage curiosity, personal growth, and meaningful conversations.
             </p>
           </RevealSection>
 
           <RevealSection delay={300}>
             <p className="text-lg leading-relaxed text-ink/85 dark:text-cream/85">
-              Through this blog, I aim to share practical travel guides, authentic local experiences,
-              destination inspiration, and helpful tips for anyone planning to explore Nepal. Whether
-              you&apos;re searching for breathtaking Himalayan adventures, peaceful heritage towns,
-              local food recommendations, or hidden cultural gems — my goal is to help you experience
-              Nepal beyond the typical tourist attractions.
+              My experience working in tour operations, travel planning, and guest services has taught me
+              the value of clear communication, attention to detail, and understanding people&apos;s diverse
+              interests. Those same principles guide every article I publish, whether I&apos;m exploring a
+              hidden destination in Nepal, discussing healthy habits, analyzing a football match, or sharing
+              practical lifestyle advice.
             </p>
           </RevealSection>
 
           <RevealSection delay={400}>
             <p className="text-lg leading-relaxed text-ink/85 dark:text-cream/85">
-              Every article is written with a focus on accuracy, authenticity, and local insight. I
-              believe the best travel experiences come from understanding the people, traditions, and
-              stories behind each destination, and I hope this platform inspires you to travel with
-              curiosity and confidence.
+              Every piece of content is created with a commitment to{' '}
+              <strong className="font-semibold text-ink dark:text-cream">accuracy, authenticity, and readability</strong>.
+              My goal isn&apos;t simply to share information, it&apos;s to provide content that is useful,
+              trustworthy, and enjoyable to read.
+            </p>
+          </RevealSection>
+
+          <RevealSection delay={500}>
+            <p className="text-lg leading-relaxed text-ink/85 dark:text-cream/85">
+              I believe learning never stops, and the best ideas often come from exploring different
+              perspectives. Through this platform, I hope to build a space where readers can discover
+              new places, gain practical knowledge, stay informed, and find inspiration for everyday life.
             </p>
           </RevealSection>
         </div>
@@ -165,7 +173,7 @@ export function AboutContent() {
           <RevealSection>
             <p className="text-center section-label">What You&apos;ll Find Here</p>
             <h2 className="mt-2 text-center font-display text-3xl font-medium text-ink dark:text-cream md:text-4xl">
-              Stories With Substance
+              Topics I Write About
             </h2>
           </RevealSection>
 
@@ -197,12 +205,12 @@ export function AboutContent() {
               My Mission
             </div>
             <blockquote className="font-display text-2xl font-medium leading-snug text-ink dark:text-cream md:text-3xl">
-              To inspire meaningful travel by sharing authentic experiences, practical travel advice,
-              and the rich cultural heritage of Nepal
+              To create reliable, thoughtfully researched content that informs, inspires, and helps
+              readers discover new ideas and find inspiration for everyday life
             </blockquote>
             <p className="mt-6 text-base leading-relaxed text-ink-muted dark:text-cream/60">
-              — helping travelers explore the country with confidence while supporting
-              responsible and sustainable tourism.
+              — whether through travel stories, practical advice, or conversations that encourage
+              curiosity and personal growth.
             </p>
           </div>
         </RevealSection>
@@ -214,11 +222,11 @@ export function AboutContent() {
           <div className="mx-auto max-w-2xl text-center">
             <p className="section-label text-gold">Thank You</p>
             <h2 className="mt-4 font-display text-3xl font-medium md:text-4xl">
-              Let&apos;s Explore Together
+              Happy Reading
             </h2>
             <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-cream/80">
-              Thank you for visiting. I hope this website becomes a trusted companion for
-              your next adventure in Nepal.
+              Thank you for visiting, and I hope you enjoy reading as much as I enjoy
+              creating content for you.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <a

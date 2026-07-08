@@ -4,7 +4,7 @@ import { AboutContent } from '@/components/about/AboutContent';
 export const metadata = buildPageMetadata({
   title: 'About',
   description:
-    'Meet Salina Maharjan — a tourism and hospitality professional sharing authentic travel guides, cultural stories, and hidden gems of Nepal.',
+    'Meet Salina Maharjan — a tourism and hospitality professional, content writer, and lifelong learner sharing thoughtful articles on travel, health, lifestyle, and more.',
   path: '/about',
 });
 
