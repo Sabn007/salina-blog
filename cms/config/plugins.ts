@@ -22,23 +22,45 @@ const deniedExecutableTypes = [
   'application/x-mach-binary',
 ];
 
-const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin => ({
-  'users-permissions': {
-    config: {
-      jwtManagement: 'refresh',
-      sessions: {
-        httpOnly: true,
+const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin => {
+  const cloudName = env('CLOUDINARY_NAME');
+  const apiKey = env('CLOUDINARY_KEY');
+  const apiSecret = env('CLOUDINARY_SECRET');
+  const useCloudinary = Boolean(cloudName && apiKey && apiSecret);
+
+  return {
+    'users-permissions': {
+      config: {
+        jwtManagement: 'refresh',
+        sessions: {
+          httpOnly: true,
+        },
       },
     },
-  },
-  upload: {
-    config: {
-      security: {
-        allowedTypes: allowedMediaTypes,
-        deniedTypes: deniedExecutableTypes,
+    upload: {
+      config: {
+        ...(useCloudinary
+          ? {
+              provider: 'cloudinary',
+              providerOptions: {
+                cloud_name: cloudName,
+                api_key: apiKey,
+                api_secret: apiSecret,
+              },
+              actionOptions: {
+                upload: {},
+                uploadStream: {},
+                delete: {},
+              },
+            }
+          : {}),
+        security: {
+          allowedTypes: allowedMediaTypes,
+          deniedTypes: deniedExecutableTypes,
+        },
       },
     },
-  },
-});
+  };
+};
 
 export default config;

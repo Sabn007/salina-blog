@@ -8,6 +8,7 @@ import {
   isCmsHost,
   resolveSiteUrl,
   resolveStrapiUrl,
+  toSiteAssetUrl,
 } from './site.ts';
 
 test('production SITE_URL equal to STRAPI_URL is rejected', () => {
@@ -61,4 +62,9 @@ test('isCmsHost detects the Render CMS host', () => {
   assert.equal(isCmsHost(PRODUCTION_STRAPI_URL), true);
   assert.equal(isCmsHost(PRODUCTION_SITE_URL, PRODUCTION_STRAPI_URL), false);
   assert.equal(isCmsHost(LOCAL_STRAPI_URL), true);
+});
+
+test('toSiteAssetUrl leaves Cloudinary URLs on res.cloudinary.com', () => {
+  const cloudinary = 'https://res.cloudinary.com/demo/image/upload/v1/cover.jpg';
+  assert.equal(toSiteAssetUrl(cloudinary), cloudinary);
 });

@@ -54,3 +54,11 @@ services:
         generateValue: true
       - key: ENCRYPTION_KEY
         generateValue: true
+      # Fill these in the Render dashboard (never commit real values).
+      # Free Cloudinary account: https://cloudinary.com/users/register/free
+      - key: CLOUDINARY_NAME
+        sync: false
+      - key: CLOUDINARY_KEY
+        sync: false
+      - key: CLOUDINARY_SECRET
+        sync: false

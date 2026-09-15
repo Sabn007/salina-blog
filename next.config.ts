@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
         hostname: '**',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
     ],
   },
   async rewrites() {

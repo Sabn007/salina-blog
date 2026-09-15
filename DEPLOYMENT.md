@@ -45,9 +45,12 @@ salina-blog/
 4. Render creates:
    - PostgreSQL database (`salina-db`)
    - Web service (`salina-cms`) with `rootDir: cms`
-5. After deploy, set **FRONTEND_URL** manually (you'll get Vercel URL in Part 2):
+5. After deploy, set **FRONTEND_URL** (you'll get the Vercel URL in Part 2) and the Cloudinary vars from the [Media uploads](#media-uploads-in-production-cloudinary) section:
    ```
-   https://salina-blog-mu.vercel.app
+   FRONTEND_URL=https://salina-blog-mu.vercel.app
+   CLOUDINARY_NAME=...
+   CLOUDINARY_KEY=...
+   CLOUDINARY_SECRET=...
    ```
 6. Note your CMS URL: `https://salina-cms.onrender.com`
 
@@ -80,6 +83,10 @@ salina-blog/
    JWT_SECRET=random-string
    TRANSFER_TOKEN_SALT=random-string
    ENCRYPTION_KEY=random-string
+
+   CLOUDINARY_NAME=your-cloud-name
+   CLOUDINARY_KEY=your-api-key
+   CLOUDINARY_SECRET=your-api-secret
    ```
 
    Generate secrets locally:
@@ -161,14 +168,38 @@ salina-blog/
 
 ---
 
-## Media uploads in production
+## Media uploads in production (Cloudinary)
 
-Render free tier **does not persist** local file uploads after redeploy.
+Render free-tier disk is **ephemeral**. Files stored under Strapi's local `/uploads` directory are deleted on every redeploy, while the database still references those URLs — cover images then 404.
 
-**Options:**
-1. **Cloudinary** (free tier) — install `@strapi/provider-upload-cloudinary`
-2. **Uploadthing / S3** — Strapi upload providers
-3. For testing only — local uploads work until next redeploy
+This CMS uses `@strapi/provider-upload-cloudinary`. When `CLOUDINARY_NAME`, `CLOUDINARY_KEY`, and `CLOUDINARY_SECRET` are all set, the Media Library writes to Cloudinary instead of disk.
+
+### 1. Create a free Cloudinary account
+
+1. Sign up at [cloudinary.com](https://cloudinary.com/users/register/free) (the free tier is enough for this blog).
+2. Open the **Dashboard** and copy **Cloud Name**, **API Key**, and **API Secret**.
+
+Do **not** commit these values. Keep them in Render (and optionally a local `cms/.env`, which is gitignored).
+
+### 2. Set env vars on Render
+
+**Dashboard:** Web Service `salina-cms` → **Environment** → **Add Environment Variable**:
+
+| Key | Value |
+|---|---|
+| `CLOUDINARY_NAME` | Cloudinary **Cloud Name** |
+| `CLOUDINARY_KEY` | Cloudinary **API Key** |
+| `CLOUDINARY_SECRET` | Cloudinary **API Secret** |
+
+**Blueprint:** `render.yaml` declares these keys with `sync: false`. Paste the values in the Blueprint confirm screen or on the service Environment tab after the first deploy.
+
+Save, then **Manual Deploy → Deploy latest commit** (or wait for the next git deploy) so Strapi picks up the new provider config.
+
+### 3. Re-upload existing images
+
+Switching provider does **not** migrate files already stored on disk. Rows that still point at `/uploads/...` will keep 404ing. In Strapi Admin, re-upload cover images (and any other media) so records use Cloudinary URLs (`https://res.cloudinary.com/...`).
+
+Local development can omit the Cloudinary variables; Strapi then uses the local disk provider.
 
 ---
 
@@ -195,7 +226,8 @@ Every `git push` triggers:
 | Homepage empty / “No stories found yet” | True empty vs CMS error: if the CMS is sleeping, wait 30–60s and retry. One failed parallel fetch (e.g. featured) must not blank posts/categories. Check Vercel logs for `[strapi] 401/403`. |
 | Canonical/OG point at the CMS | `NEXT_PUBLIC_SITE_URL` must be `https://salina-blog-mu.vercel.app`, not `https://salina-cms.onrender.com`. |
 | CORS error | Set `FRONTEND_URL` on Render to exact Vercel URL |
-| Images broken | Set `NEXT_PUBLIC_STRAPI_URL` correctly; check Strapi uploads |
+| Images broken | Set `NEXT_PUBLIC_STRAPI_URL`; confirm media URLs are Cloudinary (`res.cloudinary.com`), not `/uploads` |
+| Cover images 404 after Render redeploy | Set `CLOUDINARY_*` on Render, redeploy CMS, then re-upload media in Strapi Admin |
 | 403 on API | Enable Public permissions in Strapi admin |
 | Build fails on Vercel | Ensure Root Directory is `.` not `cms` |
 | **Database connection failed** | Set `DATABASE_SSL=true` and `DATABASE_SSL_REJECT_UNAUTHORIZED=false` on Render |
@@ -236,4 +268,7 @@ API_TOKEN_SALT=...
 JWT_SECRET=...
 TRANSFER_TOKEN_SALT=...
 ENCRYPTION_KEY=...
+CLOUDINARY_NAME=<cloudinary-cloud-name>
+CLOUDINARY_KEY=<cloudinary-api-key>
+CLOUDINARY_SECRET=<cloudinary-api-secret>
 ```
