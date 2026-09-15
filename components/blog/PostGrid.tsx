@@ -1,24 +1,22 @@
 import type { PostListItem } from '@/types/strapi';
 import { PostCard } from './PostCard';
+import { CmsEmptyState } from '@/components/ui/CmsEmptyState';
 
 export function PostGrid({
   posts,
   columns = 3,
+  error = false,
 }: {
   posts: PostListItem[];
   columns?: 2 | 3;
+  error?: boolean;
 }) {
+  if (error && !posts.length) {
+    return <CmsEmptyState error resource="stories" />;
+  }
+
   if (!posts.length) {
-    return (
-      <div className="py-16 text-center">
-        <p className="font-display text-2xl text-ink-muted dark:text-cream/50">
-          No stories found yet.
-        </p>
-        <p className="mt-2 text-sm text-ink-muted dark:text-cream/40">
-          Check back soon for new content.
-        </p>
-      </div>
-    );
+    return <CmsEmptyState resource="stories" />;
   }
 
   return (

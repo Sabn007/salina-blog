@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
+import { getStrapiBaseUrl } from './lib/site';
 
-const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+const strapiUrl = getStrapiBaseUrl();
 
 const nextConfig: NextConfig = {
   images: {

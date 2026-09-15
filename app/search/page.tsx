@@ -3,6 +3,7 @@ import { PostGrid } from '@/components/blog/PostGrid';
 import { SearchForm } from '@/components/blog/SearchForm';
 import { Pagination } from '@/components/ui/Pagination';
 import { searchPosts } from '@/lib/strapi/queries';
+import { settleCms } from '@/lib/strapi/client';
 import { buildPageMetadata } from '@/lib/seo';
 
 export const metadata = buildPageMetadata({
@@ -22,29 +23,34 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
 
   let posts: Awaited<ReturnType<typeof searchPosts>>['data'] = [];
   let totalPages = 1;
+  let fetchFailed = false;
 
-  try {
-    const response = await searchPosts(query, page);
-    posts = response.data;
-    totalPages = response.meta?.pagination?.pageCount || 1;
-  } catch {
-    // empty
+  const result = await settleCms(`search "${query}"`, searchPosts(query, page));
+  if (result.ok) {
+    posts = result.data.data;
+    totalPages = result.data.meta?.pagination?.pageCount || 1;
+  } else {
+    fetchFailed = true;
   }
 
   return (
     <>
       <p className="mb-8 text-sm text-ink-muted dark:text-cream/50">
-        {posts.length > 0
-          ? `Found results for "${query}"`
-          : `No results found for "${query}"`}
+        {fetchFailed
+          ? `We couldn't search for "${query}" right now.`
+          : posts.length > 0
+            ? `Found results for "${query}"`
+            : `No results found for "${query}"`}
       </p>
-      <PostGrid posts={posts} columns={2} />
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages}
-        basePath="/search"
-        query={{ q: query }}
-      />
+      <PostGrid posts={posts} columns={2} error={fetchFailed} />
+      {!fetchFailed && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          basePath="/search"
+          query={{ q: query }}
+        />
+      )}
     </>
   );
 }

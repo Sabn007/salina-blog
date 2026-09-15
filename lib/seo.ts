@@ -1,16 +1,22 @@
 import type { Metadata } from 'next';
 import type { Post, StrapiImage } from '@/types/strapi';
 import { getStrapiMedia } from '@/lib/strapi/client';
+import { getSiteUrl, toSiteAssetUrl } from '@/lib/site';
 import { stripHtml } from '@/lib/utils';
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'Salina Journal';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 const SITE_DESCRIPTION =
   process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
   'A premium lifestyle and travel journal — curated stories, destinations, and inspiration for the modern wanderer.';
 
 export function getSiteConfig() {
-  return { name: SITE_NAME, url: SITE_URL, description: SITE_DESCRIPTION };
+  return { name: SITE_NAME, url: getSiteUrl(), description: SITE_DESCRIPTION };
+}
+
+function seoImageUrl(image?: string) {
+  if (!image) return `${getSiteUrl()}/og-default.jpg`;
+  const media = image.startsWith('http') || image.startsWith('/') ? getStrapiMedia(image) || image : image;
+  return toSiteAssetUrl(media) || `${getSiteUrl()}/og-default.jpg`;
 }
 
 export function buildPageMetadata({
@@ -28,15 +34,16 @@ export function buildPageMetadata({
   type?: 'website' | 'article';
   noIndex?: boolean;
 }): Metadata {
+  const siteUrl = getSiteUrl();
   const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
   const pageDescription = description || SITE_DESCRIPTION;
-  const url = `${SITE_URL}${path}`;
-  const ogImage = image || `${SITE_URL}/og-default.jpg`;
+  const url = `${siteUrl}${path}`;
+  const ogImage = seoImageUrl(image);
 
   return {
     title: pageTitle,
     description: pageDescription,
-    metadataBase: new URL(SITE_URL),
+    metadataBase: new URL(siteUrl),
     alternates: { canonical: url },
     robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
     openGraph: {
@@ -68,13 +75,14 @@ export function buildPostMetadata(post: Post): Metadata {
 }
 
 export function buildArticleJsonLd(post: Post) {
+  const siteUrl = getSiteUrl();
   const image = post.seoImage || post.coverImage;
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.seoDescription || post.excerpt || stripHtml(post.content).slice(0, 160),
-    image: image ? getStrapiMedia(image.url) : undefined,
+    image: image ? toSiteAssetUrl(getStrapiMedia(image.url)) : undefined,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt,
     author: post.author
@@ -87,25 +95,26 @@ export function buildArticleJsonLd(post: Post) {
     publisher: {
       '@type': 'Organization',
       name: SITE_NAME,
-      url: SITE_URL,
+      url: siteUrl,
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SITE_URL}/blog/${post.slug}`,
+      '@id': `${siteUrl}/blog/${post.slug}`,
     },
   };
 }
 
 export function buildWebsiteJsonLd() {
+  const siteUrl = getSiteUrl();
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: SITE_NAME,
-    url: SITE_URL,
+    url: siteUrl,
     description: SITE_DESCRIPTION,
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${SITE_URL}/search?q={search_term_string}`,
+      target: `${siteUrl}/search?q={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   };

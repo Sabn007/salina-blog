@@ -56,6 +56,7 @@ export async function getPostBySlug(slug: string, preview = false) {
 
   const response = await strapiFetch<StrapiResponse<Post[]>>(`/api/posts?${POST_POPULATE}`, {
     params,
+    auth: preview,
     next: preview ? { revalidate: 0 } : { revalidate: 60, tags: ['posts', `post-${slug}`] },
   });
 

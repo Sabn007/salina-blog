@@ -2,6 +2,7 @@ import { PostGrid } from '@/components/blog/PostGrid';
 import { Pagination } from '@/components/ui/Pagination';
 import { AdSense } from '@/components/ads/AdSense';
 import { getPosts } from '@/lib/strapi/queries';
+import { settleCms } from '@/lib/strapi/client';
 import { buildPageMetadata } from '@/lib/seo';
 
 export const metadata = buildPageMetadata({
@@ -18,16 +19,9 @@ export default async function BlogPage({
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
-  let posts: Awaited<ReturnType<typeof getPosts>>['data'] = [];
-  let totalPages = 1;
-
-  try {
-    const response = await getPosts(page, 12);
-    posts = response.data;
-    totalPages = response.meta?.pagination?.pageCount || 1;
-  } catch {
-    // empty state
-  }
+  const result = await settleCms('blog posts', getPosts(page, 12));
+  const posts = result.ok ? result.data.data : [];
+  const totalPages = result.ok ? result.data.meta?.pagination?.pageCount || 1 : 1;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -43,9 +37,11 @@ export default async function BlogPage({
 
       <AdSense slot="blog-top" className="mb-8" />
 
-      <PostGrid posts={posts} />
+      <PostGrid posts={posts} error={!result.ok} />
 
-      <Pagination currentPage={page} totalPages={totalPages} basePath="/blog" />
+      {result.ok && (
+        <Pagination currentPage={page} totalPages={totalPages} basePath="/blog" />
+      )}
 
       <AdSense slot="blog-bottom" className="mt-8" />
     </div>
