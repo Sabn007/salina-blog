@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { PostGrid } from '@/components/blog/PostGrid';
 import { Pagination } from '@/components/ui/Pagination';
 import { getCategoryBySlug, getPostsByCategory } from '@/lib/strapi/queries';
+import { settleCms } from '@/lib/strapi/client';
 import { buildPageMetadata } from '@/lib/seo';
 
 export const dynamicParams = true;
@@ -35,16 +36,9 @@ export default async function CategoryPage({
   const category = await getCategoryBySlug(slug).catch(() => null);
   if (!category) notFound();
 
-  let posts: Awaited<ReturnType<typeof getPostsByCategory>>['data'] = [];
-  let totalPages = 1;
-
-  try {
-    const response = await getPostsByCategory(slug, page);
-    posts = response.data;
-    totalPages = response.meta?.pagination?.pageCount || 1;
-  } catch {
-    // empty
-  }
+  const result = await settleCms(`posts in category ${slug}`, getPostsByCategory(slug, page));
+  const posts = result.ok ? result.data.data : [];
+  const totalPages = result.ok ? result.data.meta?.pagination?.pageCount || 1 : 1;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -60,8 +54,10 @@ export default async function CategoryPage({
         )}
       </header>
 
-      <PostGrid posts={posts} />
-      <Pagination currentPage={page} totalPages={totalPages} basePath={`/category/${slug}`} />
+      <PostGrid posts={posts} error={!result.ok} />
+      {result.ok && (
+        <Pagination currentPage={page} totalPages={totalPages} basePath={`/category/${slug}`} />
+      )}
     </div>
   );
 }

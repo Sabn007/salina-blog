@@ -19,7 +19,7 @@ salina-blog/
 
 | Service | Platform | Cost | URL |
 |---|---|---|---|
-| Next.js frontend | [Vercel](https://vercel.com) | Free | `https://your-site.vercel.app` |
+| Next.js frontend | [Vercel](https://vercel.com) | Free | `https://salina-blog-mu.vercel.app` |
 | Strapi CMS | [Render](https://render.com) | Free* | `https://salina-cms.onrender.com` |
 | PostgreSQL | Render (via `render.yaml`) | Free* | Internal |
 
@@ -47,7 +47,7 @@ salina-blog/
    - Web service (`salina-cms`) with `rootDir: cms`
 5. After deploy, set **FRONTEND_URL** manually (you'll get Vercel URL in Part 2):
    ```
-   https://your-site.vercel.app
+   https://salina-blog-mu.vercel.app
    ```
 6. Note your CMS URL: `https://salina-cms.onrender.com`
 
@@ -72,7 +72,7 @@ salina-blog/
    DATABASE_CLIENT=postgres
    DATABASE_URL=postgresql://...   # from Render/Neon
    DATABASE_SSL=true
-   FRONTEND_URL=https://your-site.vercel.app
+   FRONTEND_URL=https://salina-blog-mu.vercel.app
 
    APP_KEYS=key1,key2,key3,key4
    API_TOKEN_SALT=random-string
@@ -120,11 +120,15 @@ salina-blog/
 
    ```env
    NEXT_PUBLIC_STRAPI_URL=https://salina-cms.onrender.com
-   NEXT_PUBLIC_SITE_URL=https://your-site.vercel.app
+   NEXT_PUBLIC_SITE_URL=https://salina-blog-mu.vercel.app
    NEXT_PUBLIC_SITE_NAME=Salina Journal
    NEXT_PUBLIC_SITE_DESCRIPTION=A premium lifestyle and travel journal
-   STRAPI_API_TOKEN=your-read-only-api-token
+   # Optional — draft preview only. Public reads succeed without this.
+   # Do not rely on a bad/expired token for homepage/blog fetches.
+   # STRAPI_API_TOKEN=your-read-only-api-token
    ```
+
+   `NEXT_PUBLIC_SITE_URL` is the **frontend** origin (canonical, `og:url`, JSON-LD). `NEXT_PUBLIC_STRAPI_URL` is the **CMS** origin. They must not be the same value.
 
 5. Click **Deploy**
 
@@ -188,7 +192,8 @@ Every `git push` triggers:
 | **Build fails: `better-sqlite3` compile error** | Fixed — moved to `optionalDependencies` (production uses Postgres only). |
 | **Build fails: JavaScript heap out of memory** | Render free tier has 512MB RAM; Strapi admin build needs more. Upgrade to **Starter** ($7/mo) OR set build command to `npm run render-build`. |
 | **Build fails: cannot find module** | Ensure **Root Directory** is `cms` on Render. |
-| Homepage empty | Strapi sleeping — wait 30–60s, refresh |
+| Homepage empty / “No stories found yet” | True empty vs CMS error: if the CMS is sleeping, wait 30–60s and retry. One failed parallel fetch (e.g. featured) must not blank posts/categories. Check Vercel logs for `[strapi] 401/403`. |
+| Canonical/OG point at the CMS | `NEXT_PUBLIC_SITE_URL` must be `https://salina-blog-mu.vercel.app`, not `https://salina-cms.onrender.com`. |
 | CORS error | Set `FRONTEND_URL` on Render to exact Vercel URL |
 | Images broken | Set `NEXT_PUBLIC_STRAPI_URL` correctly; check Strapi uploads |
 | 403 on API | Enable Public permissions in Strapi admin |
@@ -214,9 +219,9 @@ If not using Blueprint, set these in the Render dashboard:
 ### Vercel (frontend)
 ```
 NEXT_PUBLIC_STRAPI_URL=https://salina-cms.onrender.com
-NEXT_PUBLIC_SITE_URL=https://your-site.vercel.app
+NEXT_PUBLIC_SITE_URL=https://salina-blog-mu.vercel.app
 NEXT_PUBLIC_SITE_NAME=Salina Journal
-STRAPI_API_TOKEN=<read-only-token>
+# STRAPI_API_TOKEN=<read-only-token>   # optional, draft preview only
 ```
 
 ### Render (cms)
@@ -224,7 +229,7 @@ STRAPI_API_TOKEN=<read-only-token>
 DATABASE_CLIENT=postgres
 DATABASE_URL=<postgres-connection-string>
 DATABASE_SSL=true
-FRONTEND_URL=https://your-site.vercel.app
+FRONTEND_URL=https://salina-blog-mu.vercel.app
 APP_KEYS=...
 ADMIN_JWT_SECRET=...
 API_TOKEN_SALT=...

@@ -10,7 +10,8 @@
     "build:cms": "npm run build --prefix cms",
     "start": "next start",
     "start:cms": "npm run start --prefix cms",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --experimental-strip-types --test lib/site.test.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

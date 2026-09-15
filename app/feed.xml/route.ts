@@ -38,8 +38,11 @@ export async function GET() {
         category: post.category ? [{ name: post.category.name }] : [],
       });
     });
-  } catch {
-    // Return empty feed if Strapi unavailable
+  } catch (error) {
+    console.error(
+      '[strapi] RSS feed fetch failed:',
+      error instanceof Error ? error.message : error
+    );
   }
 
   return new Response(feed.rss2(), {

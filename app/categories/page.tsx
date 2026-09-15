@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getCategories } from '@/lib/strapi/queries';
-import { getStrapiMedia } from '@/lib/strapi/client';
+import { getStrapiMedia, settleCms } from '@/lib/strapi/client';
 import { buildPageMetadata } from '@/lib/seo';
+import { CmsEmptyState } from '@/components/ui/CmsEmptyState';
 
 export const metadata = buildPageMetadata({
   title: 'Categories',
@@ -11,14 +12,8 @@ export const metadata = buildPageMetadata({
 });
 
 export default async function CategoriesPage() {
-  let categories: Awaited<ReturnType<typeof getCategories>>['data'] = [];
-
-  try {
-    const response = await getCategories();
-    categories = response.data;
-  } catch {
-    // empty
-  }
+  const result = await settleCms('categories', getCategories());
+  const categories = result.ok ? result.data.data : [];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -29,48 +24,55 @@ export default async function CategoriesPage() {
         </h1>
       </header>
 
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {categories.map((category) => {
-          const imageUrl =
-            category.coverImage?.formats?.medium?.url || category.coverImage?.url;
+      {result.ok ? (
+        <>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {categories.map((category) => {
+              const imageUrl =
+                category.coverImage?.formats?.medium?.url || category.coverImage?.url;
 
-          return (
-            <Link
-              key={category.documentId}
-              href={`/category/${category.slug}`}
-              className="group card-hover overflow-hidden rounded-sm bg-white dark:bg-charcoal-light"
-            >
-              <div className="relative aspect-[16/10] overflow-hidden">
-                {imageUrl ? (
-                  <Image
-                    src={getStrapiMedia(imageUrl)}
-                    alt={category.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center bg-sage/10">
-                    <span className="font-display text-5xl text-sage/30">{category.name[0]}</span>
+              return (
+                <Link
+                  key={category.documentId}
+                  href={`/category/${category.slug}`}
+                  className="group card-hover overflow-hidden rounded-sm bg-white dark:bg-charcoal-light"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    {imageUrl ? (
+                      <Image
+                        src={getStrapiMedia(imageUrl)}
+                        alt={category.name}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-sage/10">
+                        <span className="font-display text-5xl text-sage/30">{category.name[0]}</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 to-transparent" />
+                    <div className="absolute bottom-0 left-0 p-6">
+                      <h2 className="font-display text-2xl font-medium text-cream">{category.name}</h2>
+                      {category.description && (
+                        <p className="mt-1 line-clamp-2 text-sm text-cream/70">{category.description}</p>
+                      )}
+                    </div>
                   </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h2 className="font-display text-2xl font-medium text-cream">{category.name}</h2>
-                  {category.description && (
-                    <p className="mt-1 line-clamp-2 text-sm text-cream/70">{category.description}</p>
-                  )}
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+                </Link>
+              );
+            })}
+          </div>
 
-      {categories.length === 0 && (
-        <p className="py-16 text-center text-ink-muted dark:text-cream/50">
-          No categories yet. Create them in the Strapi admin.
-        </p>
+          {categories.length === 0 && (
+            <CmsEmptyState
+              resource="categories"
+              description="Create them in the Strapi admin, then refresh this page."
+            />
+          )}
+        </>
+      ) : (
+        <CmsEmptyState error resource="categories" />
       )}
     </div>
   );

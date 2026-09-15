@@ -137,8 +137,10 @@ On first Strapi launch, create your admin account.
 ### Draft Preview
 
 1. Create an API token in Strapi: **Settings → API Tokens → Read-only**
-2. Add to `.env.local`: `STRAPI_API_TOKEN=your-token`
+2. Add to `.env.local`: `STRAPI_API_TOKEN=your-token` (frontend server only)
 3. Preview URL: `http://localhost:3000/blog/your-slug?preview=true`
+
+Public homepage/blog/category reads do **not** require this token and must not send `Authorization`. Only draft preview attaches the Bearer token.
 
 ## API Integration
 
@@ -187,10 +189,10 @@ Recommended hosts: Railway, Render, DigitalOcean, or a VPS with PM2.
 
 | Variable | Where | Description |
 |---|---|---|
-| `NEXT_PUBLIC_STRAPI_URL` | Frontend | Strapi API URL |
-| `NEXT_PUBLIC_SITE_URL` | Frontend | Production site URL |
+| `NEXT_PUBLIC_STRAPI_URL` | Frontend | Strapi **CMS** API URL (`https://salina-cms.onrender.com` in production). Never use this as the site URL. |
+| `NEXT_PUBLIC_SITE_URL` | Frontend | Public **frontend** URL for canonical, Open Graph, Twitter, JSON-LD (`https://salina-blog-mu.vercel.app` in production). Never set this to the CMS host. |
 | `NEXT_PUBLIC_SITE_NAME` | Frontend | Site name for SEO |
-| `STRAPI_API_TOKEN` | Frontend (server) | For draft preview |
+| `STRAPI_API_TOKEN` | Frontend (server) | Optional. Draft preview only — not required for public reads. |
 | `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | Frontend | Google AdSense publisher ID |
 | `FRONTEND_URL` | Strapi | Frontend URL for CORS & preview |
 | `DATABASE_*` | Strapi | Database credentials |

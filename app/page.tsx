@@ -3,7 +3,9 @@ import { PostCard } from '@/components/blog/PostCard';
 import { PostGrid } from '@/components/blog/PostGrid';
 import { NewsletterForm } from '@/components/newsletter/NewsletterForm';
 import { AdSense } from '@/components/ads/AdSense';
+import { CmsEmptyState } from '@/components/ui/CmsEmptyState';
 import { getFeaturedPosts, getPosts, getCategories } from '@/lib/strapi/queries';
+import { settleCms } from '@/lib/strapi/client';
 import { buildPageMetadata } from '@/lib/seo';
 
 export const metadata = buildPageMetadata({
@@ -13,22 +15,18 @@ export const metadata = buildPageMetadata({
 });
 
 export default async function HomePage() {
-  let featured: Awaited<ReturnType<typeof getFeaturedPosts>>['data'] = [];
-  let recent: Awaited<ReturnType<typeof getPosts>>['data'] = [];
-  let categories: Awaited<ReturnType<typeof getCategories>>['data'] = [];
+  const [featuredResult, recentResult, categoriesResult] = await Promise.all([
+    settleCms('featured posts', getFeaturedPosts(1)),
+    settleCms('recent posts', getPosts(1, 6)),
+    settleCms('categories', getCategories()),
+  ]);
 
-  try {
-    const [featuredRes, recentRes, categoriesRes] = await Promise.all([
-      getFeaturedPosts(1),
-      getPosts(1, 6),
-      getCategories(),
-    ]);
-    featured = featuredRes.data;
-    recent = recentRes.data;
-    categories = categoriesRes.data;
-  } catch {
-    // Strapi may not be running during build — show empty state
-  }
+  const featured = featuredResult.ok ? featuredResult.data.data : [];
+  const recent = recentResult.ok ? recentResult.data.data : [];
+  const categories = categoriesResult.ok ? categoriesResult.data.data : [];
+
+  const recentFailed = !recentResult.ok;
+  const categoriesFailed = !categoriesResult.ok;
 
   const heroPost = featured[0] || recent[0];
   const gridPosts = recent.filter((p) => p.documentId !== heroPost?.documentId);
@@ -89,7 +87,7 @@ export default async function HomePage() {
       </div>
 
       {/* Categories */}
-      {categories.length > 0 && (
+      {(categories.length > 0 || categoriesFailed) && (
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="mb-8 flex items-end justify-between">
             <div>
@@ -105,17 +103,21 @@ export default async function HomePage() {
               View All →
             </Link>
           </div>
-          <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
-              <Link
-                key={category.documentId}
-                href={`/category/${category.slug}`}
-                className="rounded-full border border-ink/10 px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-terracotta hover:text-terracotta dark:border-cream/20 dark:text-cream"
-              >
-                {category.name}
-              </Link>
-            ))}
-          </div>
+          {categoriesFailed ? (
+            <CmsEmptyState error resource="categories" />
+          ) : (
+            <div className="flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <Link
+                  key={category.documentId}
+                  href={`/category/${category.slug}`}
+                  className="rounded-full border border-ink/10 px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-terracotta hover:text-terracotta dark:border-cream/20 dark:text-cream"
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -135,7 +137,17 @@ export default async function HomePage() {
             View All →
           </Link>
         </div>
-        <PostGrid posts={gridPosts} />
+        {gridPosts.length > 0 ? (
+          <PostGrid posts={gridPosts} />
+        ) : recentFailed ? (
+          <CmsEmptyState error resource="stories" />
+        ) : heroPost ? (
+          <p className="text-sm text-ink-muted dark:text-cream/50">
+            More stories will appear here as they are published.
+          </p>
+        ) : (
+          <PostGrid posts={gridPosts} />
+        )}
       </section>
 
       {/* Newsletter CTA */}
