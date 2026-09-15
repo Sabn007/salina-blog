@@ -45,8 +45,8 @@ On first launch, create your admin account, then:
 
 | Method | Endpoint | Public |
 |---|---|---|
-| GET | `/api/posts` | Yes |
-| GET | `/api/posts/:id` | Yes |
+| GET | `/api/posts` | Yes (published only) |
+| GET | `/api/posts/:id` | Yes (published only) |
 | GET | `/api/categories` | Yes |
 | GET | `/api/tags` | Yes |
 | GET | `/api/authors` | Yes |
@@ -58,6 +58,8 @@ On first launch, create your admin account, then:
 ```
 GET http://localhost:1337/api/posts?populate[coverImage]=true&populate[author]=true&filters[publishedAt][$notNull]=true
 ```
+
+Unauthenticated `GET /api/posts?status=draft` (and `findOne` with `status=draft`) is rejected with **403**. Draft preview requires an API token or admin auth (`Authorization: Bearer <token>`). Published list/detail without `status` is unchanged.
 
 ## Production Deployment
 
