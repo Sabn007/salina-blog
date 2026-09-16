@@ -11,7 +11,7 @@
     "start": "next start",
     "start:cms": "npm run start --prefix cms",
     "lint": "eslint",
-    "test": "node --experimental-strip-types --test lib/site.test.ts"
+    "test": "node --experimental-strip-types --test lib/site.test.ts lib/sitemap.test.ts lib/strapi/timeout.test.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
