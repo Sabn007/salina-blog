@@ -1,4 +1,7 @@
 import { getStrapiBaseUrl } from '@/lib/site';
+import { raceWithTimeout, shouldRetryNetworkError, timeoutSignal } from './timeout';
+
+export { CMS_SITEMAP_TIMEOUT_MS } from './timeout';
 
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 const IS_DEV = process.env.NODE_ENV === 'development';
@@ -24,6 +27,8 @@ type FetchOptions = RequestInit & {
   next?: { revalidate?: number | false; tags?: string[] };
   /** Attach STRAPI_API_TOKEN. Public list/detail reads must leave this false. */
   auth?: boolean;
+  /** Abort hanging CMS requests (e.g. Render free-tier cold start). Not retried. */
+  timeoutMs?: number;
 };
 
 export type CmsResult<T> =
@@ -50,7 +55,7 @@ function logStrapiFailure(status: number | undefined, requestUrl: string, detail
 }
 
 export async function strapiFetch<T>(path: string, options: FetchOptions = {}): Promise<T> {
-  const { params, headers, next, auth = false, ...rest } = options;
+  const { params, headers, next, auth = false, timeoutMs, signal: userSignal, ...rest } = options;
   const url = new URL(getStrapiURL(path));
 
   if (params) {
@@ -88,6 +93,7 @@ export async function strapiFetch<T>(path: string, options: FetchOptions = {}): 
       const skipCache = IS_DEV || rest.cache === 'no-store' || next?.revalidate === 0;
       const response = await fetch(requestUrl, {
         ...rest,
+        signal: timeoutSignal(timeoutMs) ?? userSignal,
         headers: requestHeaders,
         ...(skipCache
           ? { cache: 'no-store' as const }
@@ -117,10 +123,11 @@ export async function strapiFetch<T>(path: string, options: FetchOptions = {}): 
         throw error;
       }
       logStrapiFailure(undefined, requestUrl, error instanceof Error ? error.message : String(error));
-      if (attempt < MAX_ATTEMPTS) {
+      if (shouldRetryNetworkError(error, attempt, MAX_ATTEMPTS)) {
         await delay(RETRY_DELAY_MS * attempt);
         continue;
       }
+      break;
     }
   }
 
@@ -130,9 +137,13 @@ export async function strapiFetch<T>(path: string, options: FetchOptions = {}): 
 }
 
 /** Isolate a CMS call so a sibling Promise.all entry can still succeed. */
-export async function settleCms<T>(label: string, promise: Promise<T>): Promise<CmsResult<T>> {
+export async function settleCms<T>(
+  label: string,
+  promise: Promise<T>,
+  timeoutMs?: number
+): Promise<CmsResult<T>> {
   try {
-    const data = await promise;
+    const data = timeoutMs ? await raceWithTimeout(promise, timeoutMs, label) : await promise;
     return { ok: true, data };
   } catch (error) {
     const status = error instanceof StrapiRequestError ? error.status : undefined;

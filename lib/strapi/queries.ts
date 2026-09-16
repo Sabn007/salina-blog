@@ -8,6 +8,10 @@ import type {
 } from '@/types/strapi';
 import { strapiFetch } from './client';
 
+export type CmsQueryOptions = {
+  timeoutMs?: number;
+};
+
 const POST_POPULATE =
   'populate[coverImage]=true&populate[gallery]=true&populate[author][populate][0]=avatar&populate[category]=true&populate[tags]=true&populate[relatedPosts][populate][0]=coverImage&populate[relatedPosts][populate][1]=category&populate[relatedPosts][populate][2]=author&populate[seoImage]=true';
 
@@ -63,7 +67,7 @@ export async function getPostBySlug(slug: string, preview = false) {
   return response.data[0] ?? null;
 }
 
-export async function getAllPostSlugs() {
+export async function getAllPostSlugs(options?: CmsQueryOptions) {
   const response = await strapiFetch<StrapiResponse<{ slug: string }[]>>('/api/posts', {
     params: {
       ...publishedFilter(),
@@ -71,6 +75,7 @@ export async function getAllPostSlugs() {
       'pagination[pageSize]': 100,
     },
     next: { revalidate: 3600, tags: ['posts'] },
+    timeoutMs: options?.timeoutMs,
   });
 
   return response.data.map((post) => post.slug);
@@ -114,7 +119,7 @@ export async function getPostsByTag(slug: string, page = 1) {
   });
 }
 
-export async function getCategories() {
+export async function getCategories(options?: CmsQueryOptions) {
   return strapiFetch<StrapiResponse<Category[]>>('/api/categories', {
     params: {
       'populate[coverImage]': 'true',
@@ -122,6 +127,7 @@ export async function getCategories() {
       'pagination[pageSize]': 50,
     },
     next: { revalidate: 300, tags: ['categories'] },
+    timeoutMs: options?.timeoutMs,
   });
 }
 
@@ -136,13 +142,14 @@ export async function getCategoryBySlug(slug: string) {
   return response.data[0] ?? null;
 }
 
-export async function getTags() {
+export async function getTags(options?: CmsQueryOptions) {
   return strapiFetch<StrapiResponse<Tag[]>>('/api/tags', {
     params: {
       'sort[0]': 'name:asc',
       'pagination[pageSize]': 100,
     },
     next: { revalidate: 300, tags: ['tags'] },
+    timeoutMs: options?.timeoutMs,
   });
 }
 
